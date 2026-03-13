@@ -1,306 +1,213 @@
 import React, { useRef, useState } from "react";
-import { FaExchangeAlt, FaLinkedin } from "react-icons/fa";
+import { FaExchangeAlt, FaLinkedin, FaArrowRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const featuresRef = useRef(null);
   const exploreRef = useRef(null);
   const navigate = useNavigate();
-
   const [showPopup, setShowPopup] = useState(false);
 
-  const scrollToFeatures = () =>
-    featuresRef.current?.scrollIntoView({ behavior: "smooth" });
-  const scrollToExplore = () =>
-    exploreRef.current?.scrollIntoView({ behavior: "smooth" });
-
-  const handleFeatureClick = () => {
-    setShowPopup(true);
-  };
-
-  const closePopup = () => {
-    setShowPopup(false);
-  };
-
-  const goToSignup = () => {
-    navigate("/signup");
-  };
+  const scrollToFeatures = () => featuresRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToExplore = () => exploreRef.current?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-pink-200 via-pink-100 to-yellow-100 font-sans text-gray-900 transition duration-300">
+    <div className="w-full min-h-screen font-sans" style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}>
+
       {/* Navbar */}
-      <div className="w-full flex justify-between items-center px-4 sm:px-6 py-4">
-        <div className="flex items-center gap-2 text-blue-600 font-bold text-xl sm:text-2xl">
-          <FaExchangeAlt className="text-pink-500 text-2xl sm:text-3xl" />
-          <span className="tracking-wide text-lg sm:text-xl">
-            Swap<span className="text-pink-500">Skill</span>
-          </span>
+      <nav className="ss-nav w-full sticky top-0 z-50 flex justify-between items-center px-6 py-4">
+        <div className="flex items-center gap-2 font-bold text-lg">
+          <FaExchangeAlt style={{ color: "var(--accent)" }} />
+          <span className="grad-text tracking-tight">SwapSkill</span>
+        </div>
+        <div className="hidden sm:flex items-center gap-6 text-sm" style={{ color: "var(--text-secondary)" }}>
+          <button onClick={scrollToFeatures} className="hover:text-white transition-colors">Features</button>
+          <button onClick={scrollToExplore} className="hover:text-white transition-colors">Explore</button>
+          <button onClick={() => navigate("/login")} className="btn-primary">Join Now</button>
+        </div>
+        <button onClick={() => navigate("/login")} className="sm:hidden btn-primary text-xs">Join Now</button>
+      </nav>
+
+      {/* Hero */}
+      <section className="relative w-full min-h-[90vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden">
+        {/* Ambient glow */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div style={{
+            position: "absolute", top: "20%", left: "50%", transform: "translateX(-50%)",
+            width: 600, height: 400, borderRadius: "50%",
+            background: "radial-gradient(ellipse, #7c6af722 0%, transparent 70%)",
+            filter: "blur(40px)"
+          }} />
         </div>
 
-        <div className="hidden sm:flex items-center gap-3 sm:gap-5 font-bold text-sm sm:text-base">
-          <button
-            onClick={scrollToFeatures}
-            className="hover:text-blue-600 px-2 sm:px-3"
-          >
-            Features
-          </button>
-          <button
-            onClick={scrollToExplore}
-            className="hover:text-blue-600 px-2 sm:px-3"
-          >
-            Explore
-          </button>
-          <button
-            onClick={() => navigate("/login")}
-            className="bg-pink-500 hover:bg-pink-600 text-white py-1.5 px-4 sm:py-2 sm:px-5 rounded-full shadow-md transition text-xs sm:text-sm"
-          >
-            Join Now
-          </button>
-        </div>
-
-        <div className="sm:hidden">
-          <button
-            onClick={() => navigate("/login")}
-            className="bg-pink-500 hover:bg-pink-600 text-white py-1.5 px-4 rounded-full shadow-md transition text-xs"
-          >
-            Join Now
-          </button>
-        </div>
-      </div>
-
-      {/* Hero Section */}
-      <section className="w-full min-h-[85vh] flex flex-col items-center justify-center text-center px-4 max-w-2xl mx-auto relative">
-        <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -z-10 w-96 h-96 bg-pink-400 rounded-full opacity-30 blur-3xl animate-pulse dark:bg-pink-600"></div>
-
-        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold uppercase tracking-widest text-gray-800 dark:text-gray-300 mb-3">
-          Connect, Teach and Learn
-        </h2>
-
-        <h1 className="text-[42px] sm:text-6xl md:text-7xl lg:text-8xl font-black bg-gradient-to-r from-pink-500 via-red-500 to-yellow-600 text-transparent bg-clip-text drop-shadow-lg animate-fade-in-down">
-          TOGETHER
-        </h1>
-
-        <p className="mt-6 text-base sm:text-lg text-gray-700 dark:text-gray-200 leading-relaxed animate-fade-in-up">
-          Join a platform where students, freelancers, and professionals teach &
-          learn from each other.
-        </p>
-
-        <button
-          onClick={scrollToFeatures}
-          className="mt-10 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:scale-105 transform transition text-lg animate-fade-in-up"
-        >
-          🚀 Explore Features
-        </button>
-      </section>
-
-      {/* Features Section */}
-      <section
-        ref={featuresRef}
-        className="w-full px-4 sm:px-6 py-16 text-center"
-      >
-        <h2 className="text-2xl sm:text-4xl font-bold mb-12 leading-tight">
-          Features of Platform
-        </h2>
-        <div className="grid gap-8 md:grid-cols-2 max-w-6xl mx-auto">
-          <div className="bg-white/70 rounded-xl p-6 shadow-md border border-gray-200 text-left">
-            <h3 className="text-xl font-semibold text-blue-800 mb-4">
-              🎯 Goal / Purpose
-            </h3>
-            <ul className="space-y-3">
-              <li className="bg-white rounded-lg p-3 shadow-sm">
-                ✔ Help users teach skills they know
-              </li>
-              <li className="bg-white rounded-lg p-3 shadow-sm">
-                ✔ Let others learn skills for free
-              </li>
-              <li className="bg-white rounded-lg p-3 shadow-sm">
-                ✔ Build a community of mutual learning
-              </li>
-              <li className="bg-white rounded-lg p-3 shadow-sm">
-                ✔ Open to everyone (students, freelancers, professionals)
-              </li>
-            </ul>
+        <div className="relative z-10 max-w-3xl">
+          <div className="ss-tag ss-tag-purple mb-6" style={{ fontSize: 12, padding: "5px 14px" }}>
+            Skills × Community × Exchange
           </div>
-          <div className="bg-white/70 rounded-xl p-6 shadow-md border border-gray-200 text-left">
-            <h3 className="text-xl font-semibold text-blue-800 mb-4">
-              🧑‍🏫💻 Use Case Examples
-            </h3>
-            <ul className="space-y-3 list-disc list-inside text-gray-800 text-base leading-relaxed">
-              <li className="bg-white rounded-lg p-3 shadow-sm">
-                <strong>John</strong> knows UI/UX — he teaches it to{" "}
-                <strong>Priya</strong>.
-              </li>
-              <li className="bg-white rounded-lg p-3 shadow-sm">
-                <strong>Nimish</strong> teaches Java to <strong>Ali</strong>,
-                who helps her with Python basics.
-              </li>
-              <li className="bg-white rounded-lg p-3 shadow-sm">
-                <strong>Ajay</strong> helps <strong>Ram</strong> with Figma, and
-                learns React in exchange.
-              </li>
-            </ul>
+
+          <h1 style={{
+            fontSize: "clamp(3rem, 8vw, 6rem)",
+            fontWeight: 900,
+            lineHeight: 1.0,
+            letterSpacing: "-0.04em",
+            marginBottom: "1.5rem"
+          }}>
+            <span className="grad-text">Teach</span> what<br />
+            you know.<br />
+            <span style={{ color: "var(--text-secondary)" }}>Learn</span> what<br />
+            you don't.
+          </h1>
+
+          <p style={{ color: "var(--text-secondary)", fontSize: 17, lineHeight: 1.7, marginBottom: "2.5rem" }}>
+            A peer-to-peer skill exchange platform where students, freelancers,<br className="hidden sm:block" />
+            and professionals teach & learn from each other — for free.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button onClick={() => navigate("/signup")} className="btn-primary" style={{ padding: "12px 28px", fontSize: 15, borderRadius: 10 }}>
+              Get Started Free
+            </button>
+            <button onClick={scrollToExplore} className="btn-outline" style={{ padding: "12px 28px", fontSize: 15, borderRadius: 10 }}>
+              See How It Works
+            </button>
           </div>
         </div>
-        <div className="mt-10">
-          <button
-            onClick={scrollToExplore}
-            className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-8 rounded-lg font-semibold shadow transition"
-          >
-            Explore More
-          </button>
+
+        {/* Stat strip */}
+        <div className="relative z-10 mt-20 flex gap-12 flex-wrap justify-center">
+          {[["500+", "Active Users"], ["1.2k+", "Skills Shared"], ["300+", "Connections Made"]].map(([num, label]) => (
+            <div key={label} className="text-center">
+              <p style={{ fontSize: 28, fontWeight: 800, color: "var(--accent)" }}>{num}</p>
+              <p style={{ fontSize: 12, color: "var(--text-muted)", letterSpacing: "0.05em", textTransform: "uppercase" }}>{label}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Explore Section */}
-      <section
-        ref={exploreRef}
-        className="w-full px-4 sm:px-6 py-16 text-center"
-      >
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 leading-tight">
-          Explore Opportunities
-        </h2>
-        <p className="max-w-xl mx-auto text-base sm:text-lg mb-12">
-          Find learners and mentors. Start exchanging your skills today!
-        </p>
+      {/* Features */}
+      <section ref={featuresRef} className="px-6 py-24">
+        <div className="max-w-5xl mx-auto">
+          <p style={{ color: "var(--accent)", fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Platform Features</p>
+          <h2 style={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "3rem" }}>
+            Everything you need<br />to exchange skills
+          </h2>
 
-        <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 max-w-6xl mx-auto">
-          {/* Card 1 */}
-          <div className="bg-white/80 border border-gray-200 p-6 rounded-xl shadow-md hover:shadow-xl transition transform hover:scale-[1.02] text-left">
-            <div className="flex items-center gap-4 mb-4">
-              <img
-                src="https://randomuser.me/api/portraits/men/32.jpg"
-                alt="User 1"
-                className="w-16 h-16 rounded-full border-2 border-blue-500"
-              />
-              <div>
-                <h3 className="text-xl font-semibold">Ravi Mehra</h3>
-                <p className="text-sm text-gray-500">Student</p>
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              { icon: "🎯", title: "Send & Receive Requests", desc: "Request to learn from someone or offer to teach what you know. Full request management with accept/decline." },
+              { icon: "💬", title: "Private Messaging", desc: "Chat directly with your skill partners once a request is accepted. Focused, distraction-free conversations." },
+              { icon: "⭐", title: "Mentor Ratings", desc: "Rate mentors after sessions. Build trust and reputation across the community." },
+              { icon: "📅", title: "Schedule Meetings", desc: "Schedule Google Meet sessions directly from the chat. No friction, just learning." },
+              { icon: "🔍", title: "Skill Discovery", desc: "Search users by skill. Find exactly who can teach you React, Python, DSA, or anything else." },
+              { icon: "🔒", title: "Secure Auth", desc: "JWT-based authentication with protected routes. Your account and data stay safe." },
+            ].map(({ icon, title, desc }) => (
+              <div key={title} className="ss-card p-6" style={{ borderRadius: 14 }}>
+                <span style={{ fontSize: 24 }}>{icon}</span>
+                <h3 style={{ fontWeight: 700, fontSize: 16, margin: "12px 0 6px" }}>{title}</h3>
+                <p style={{ color: "var(--text-secondary)", fontSize: 14, lineHeight: 1.6 }}>{desc}</p>
               </div>
-            </div>
-            <p>
-              <strong>Knows:</strong> Data Structures, Java
-            </p>
-            <p>
-              <strong>Wants to Learn:</strong> UI/UX, JavaScript
-            </p>
-            <div className="mt-4 flex gap-3 flex-wrap">
-              <button
-                onClick={handleFeatureClick}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition"
-              >
-                Request to Learn
-              </button>
-              <button
-                onClick={handleFeatureClick}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md transition"
-              >
-                Offer to Teach
-              </button>
-            </div>
-          </div>
-
-          {/* Card 2 */}
-          <div className="bg-white/80 border border-gray-200 p-6 rounded-xl shadow-md hover:shadow-xl transition transform hover:scale-[1.02] text-left">
-            <div className="flex items-center gap-4 mb-4">
-              <img
-                src="https://randomuser.me/api/portraits/women/44.jpg"
-                alt="User 2"
-                className="w-16 h-16 rounded-full border-2 border-pink-500"
-              />
-              <div>
-                <h3 className="text-xl font-semibold">Neha Sharma</h3>
-                <p className="text-sm text-gray-500">Freelancer</p>
-              </div>
-            </div>
-            <p>
-              <strong>Knows:</strong> UI/UX Design, Figma
-            </p>
-            <p>
-              <strong>Wants to Learn:</strong> DSA, Python
-            </p>
-            <div className="mt-4 flex gap-3 flex-wrap">
-              <button
-                onClick={handleFeatureClick}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition"
-              >
-                Request to Learn
-              </button>
-              <button
-                onClick={handleFeatureClick}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md transition"
-              >
-                Offer to Teach
-              </button>
-            </div>
+            ))}
           </div>
         </div>
-
-        <div className="w-full flex justify-center py-12">
-          <button
-            onClick={() => navigate("/login")}
-            className="bg-pink-500 hover:bg-pink-600 w-11/12 sm:w-3/4 md:w-[600px] text-white font-semibold py-3 px-8 rounded-full shadow-lg transition text-lg"
-          >
-            Join Now and Start Swapping Skills
-          </button>
-        </div>
-
-        {/* Popup Modal */}
-        {showPopup && (
-          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40">
-            <div className="bg-white p-6 rounded-xl shadow-xl w-[90%] max-w-sm text-center">
-              <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                Hold on!
-              </h3>
-
-              <p className="mb-6 text-gray-600">
-                Click on{" "}
-                <strong
-                  className="text-blue-600 cursor-pointer"
-                  onClick={goToSignup}
-                >
-                  Join Now
-                </strong>{" "}
-                to use the features of this website.
-              </p>
-
-              <button
-                onClick={closePopup}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        )}
       </section>
+
+      {/* Explore / Demo Cards */}
+      <section ref={exploreRef} className="px-6 py-24" style={{ borderTop: "1px solid var(--border)" }}>
+        <div className="max-w-5xl mx-auto">
+          <p style={{ color: "var(--accent)", fontSize: 12, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 12 }}>Explore</p>
+          <h2 style={{ fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "0.75rem" }}>
+            Find your skill partner
+          </h2>
+          <p style={{ color: "var(--text-secondary)", marginBottom: "3rem", fontSize: 15 }}>
+            Browse learners and mentors. Start exchanging skills today.
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-5">
+            {[
+              { name: "Ravi Mehra", role: "Student", seed: "Ravi", knows: "Data Structures, Java", learns: "UI/UX, JavaScript", color: "var(--accent)" },
+              { name: "Neha Sharma", role: "Freelancer", seed: "Neha", knows: "UI/UX Design, Figma", learns: "DSA, Python", color: "var(--pink)" },
+            ].map(({ name, role, seed, knows, learns, color }) => (
+              <div key={name} className="ss-card p-6">
+                <div className="flex items-center gap-4 mb-5">
+                  <img
+                    src={`https://api.dicebear.com/7.x/initials/svg?seed=${seed}&backgroundColor=7c6af7`}
+                    alt={name}
+                    style={{ width: 52, height: 52, borderRadius: "50%", border: `2px solid ${color}40` }}
+                  />
+                  <div>
+                    <p style={{ fontWeight: 700, fontSize: 16 }}>{name}</p>
+                    <p style={{ color: "var(--text-muted)", fontSize: 12 }}>{role}</p>
+                  </div>
+                </div>
+                <div className="space-y-2 mb-5">
+                  <div className="flex items-center gap-2">
+                    <span className="ss-tag ss-tag-green">Teaches</span>
+                    <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>{knows}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="ss-tag ss-tag-purple">Learns</span>
+                    <span style={{ fontSize: 13, color: "var(--text-secondary)" }}>{learns}</span>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={() => setShowPopup(true)} className="btn-primary" style={{ flex: 1, fontSize: 12, padding: "8px 0" }}>
+                    Request to Learn
+                  </button>
+                  <button onClick={() => setShowPopup(true)} className="btn-green" style={{ flex: 1, fontSize: 12, padding: "8px 0" }}>
+                    Offer to Teach
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <button
+              onClick={() => navigate("/signup")}
+              className="btn-primary"
+              style={{ padding: "14px 36px", fontSize: 16, borderRadius: 12, display: "inline-flex", alignItems: "center", gap: 8 }}
+            >
+              Join Now and Start Swapping <FaArrowRight size={14} />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Popup */}
+      {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ background: "rgba(0,0,0,0.7)" }}>
+          <div className="ss-card p-8 w-[90%] max-w-sm text-center" style={{ borderRadius: 16 }}>
+            <h3 style={{ fontWeight: 700, fontSize: 18, marginBottom: 12 }}>Join to continue</h3>
+            <p style={{ color: "var(--text-secondary)", fontSize: 14, marginBottom: 24, lineHeight: 1.6 }}>
+              Create a free account to send requests and connect with skill partners.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowPopup(false)} className="btn-outline" style={{ flex: 1 }}>Cancel</button>
+              <button onClick={() => navigate("/signup")} className="btn-primary" style={{ flex: 1 }}>Sign Up Free</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
-      <footer className="w-full bg-gray-900 text-white py-8 px-6 flex flex-col sm:flex-row justify-between items-center text-sm sm:text-base">
-        <div className="mb-4 sm:mb-0 flex items-center gap-2 text-center sm:text-left">
-          <FaLinkedin className="text-blue-400 text-lg" />
-          <span>
-            Developed by{" "}
-            <a
-              href="https://www.linkedin.com/in/nekalsingh/"
-              className="text-blue-400 hover:text-blue-300 transition no-underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Nekal Singh
+      <footer style={{ borderTop: "1px solid var(--border)", background: "var(--bg-card)" }} className="px-6 py-8">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-2">
+            <FaLinkedin style={{ color: "#60a5fa" }} />
+            <span style={{ color: "var(--text-secondary)", fontSize: 13 }}>
+              Built by{" "}
+              <a href="https://www.linkedin.com/in/nekalsingh/" target="_blank" rel="noreferrer"
+                style={{ color: "#60a5fa" }}>Nekal Singh</a>
+            </span>
+          </div>
+          <div className="text-right">
+            <a href="mailto:nekalsingh987@gmail.com" style={{ color: "var(--text-muted)", fontSize: 13 }}>
+              nekalsingh987@gmail.com
             </a>
-          </span>
-        </div>
-        <div className="text-center sm:text-right">
-          <p>Any Suggestions?</p>
-          <a
-            href="mailto:nekalsingh987@gmail.com"
-            className="text-red-400 hover:text-red-300 transition"
-          >
-            nekalsingh987@gmail.com
-          </a>
-          <p className="mt-1 text-gray-400 text-xs">
-            © {new Date().getFullYear()} SwapSkill. All rights reserved.
-          </p>
+            <p style={{ color: "var(--text-muted)", fontSize: 11, marginTop: 4 }}>
+              © {new Date().getFullYear()} SwapSkill
+            </p>
+          </div>
         </div>
       </footer>
     </div>

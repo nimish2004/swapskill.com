@@ -1,247 +1,196 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { FaArrowLeft, FaStar, FaCalendarAlt, FaPaperPlane } from "react-icons/fa";
 
 const ChatPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const token = useSelector((state) => state.user.token);
   const currentUser = useSelector((state) => state.user.userData);
-
   const { toUserId, toUserName, toUserEmail } = location.state || {};
 
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
-
-  // ⭐ Rating
   const [showRating, setShowRating] = useState(false);
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
+  const bottomRef = useRef(null);
 
-  // 🔹 Fetch chat messages
   useEffect(() => {
     const fetchMessages = async () => {
       try {
         const res = await axios.get(
           `https://swapskill-com.onrender.com/api/user/get-messages/${toUserId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
-
         setMessages(res.data.messages || []);
       } catch (err) {
         console.error("Failed to fetch messages", err);
       }
     };
-
     if (toUserId) fetchMessages();
   }, [toUserId, token]);
 
-  // 🔹 Send message
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   const handleSend = async () => {
     if (!text.trim()) return;
-
     try {
       await axios.post(
         "https://swapskill-com.onrender.com/api/user/send-message",
-        {
-          toUserId,
-          text,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { toUserId, text },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: currentUser._id,
-          receiver: toUserId,
-          content: text,
-        },
-      ]);
-
+      setMessages((prev) => [...prev, { sender: currentUser._id, receiver: toUserId, content: text }]);
       setText("");
     } catch (err) {
       console.error("Send error", err);
-      alert("Failed to send message");
     }
   };
 
-  // ⭐ Submit Rating
   const submitRating = async () => {
     try {
       await axios.post(
         "https://swapskill-com.onrender.com/api/user/rate-user",
-        {
-          mentorId: toUserId,
-          rating,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { mentorId: toUserId, rating },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      alert("Rating submitted successfully!");
       setShowRating(false);
+      setRating(0);
     } catch (error) {
       console.error(error);
-      alert("Failed to submit rating");
     }
   };
 
-  // 📅 Schedule Google Meet
   const scheduleMeeting = () => {
     const title = encodeURIComponent(`Meeting with ${toUserName}`);
-
     const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&add=${toUserEmail}&details=Meeting%20scheduled%20via%20SwapSkill&conferenceData.createRequest=true`;
-
     window.open(url, "_blank");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-pink-100 to-yellow-100 p-6">
+    <div className="min-h-screen flex flex-col" style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}>
 
-      {/* ⭐ Rating Popup */}
+      {/* Rating Modal */}
       {showRating && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-xl shadow-lg w-80 text-center">
-
-            <h3 className="text-lg font-bold mb-3">
-              Rate {toUserName}
-            </h3>
-
-            <div className="flex justify-center space-x-2 mb-4">
-              {[1,2,3,4,5].map((star)=>(
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: "rgba(0,0,0,0.7)" }}>
+          <div className="ss-card p-8 w-80 text-center" style={{ borderRadius: 18 }}>
+            <p style={{ fontWeight: 700, fontSize: 17, marginBottom: 6 }}>Rate {toUserName}</p>
+            <p style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 20 }}>How was your skill exchange session?</p>
+            <div className="flex justify-center gap-2 mb-6">
+              {[1, 2, 3, 4, 5].map((star) => (
                 <span
                   key={star}
-                  className={`text-3xl cursor-pointer ${(hover || rating) >= star ? "text-yellow-400":"text-gray-300"}`}
-                  onMouseEnter={()=>setHover(star)}
-                  onMouseLeave={()=>setHover(0)}
-                  onClick={()=>setRating(star)}
-                >
-                  ★
-                </span>
+                  onClick={() => setRating(star)}
+                  onMouseEnter={() => setHover(star)}
+                  onMouseLeave={() => setHover(0)}
+                  style={{
+                    fontSize: 32, cursor: "pointer",
+                    color: (hover || rating) >= star ? "var(--amber)" : "var(--text-muted)",
+                    transition: "color 0.1s, transform 0.1s",
+                    transform: (hover || rating) >= star ? "scale(1.15)" : "scale(1)",
+                    display: "inline-block"
+                  }}
+                >★</span>
               ))}
             </div>
-
-            <div className="flex justify-between">
-              <button
-                onClick={()=>setShowRating(false)}
-                className="px-4 py-2 rounded-md bg-gray-300"
-              >
-                Cancel
-              </button>
-
-              <button
-                onClick={submitRating}
-                className="px-4 py-2 rounded-md bg-blue-600 text-white"
-              >
-                Submit
-              </button>
+            <div className="flex gap-3">
+              <button onClick={() => setShowRating(false)} className="btn-outline" style={{ flex: 1 }}>Cancel</button>
+              <button onClick={submitRating} className="btn-primary" style={{ flex: 1 }} disabled={rating === 0}>Submit</button>
             </div>
-
           </div>
         </div>
       )}
 
       {/* Header */}
-      <div className="max-w-2xl mx-auto mb-4 flex justify-between items-center">
+      <div className="ss-nav sticky top-0 z-40 px-4 sm:px-6 py-3">
+        <div style={{ maxWidth: 700, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <button onClick={() => navigate("/edit-profile")} className="btn-outline" style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", fontSize: 13 }}>
+            <FaArrowLeft size={11} /> Back
+          </button>
 
-        <button
-          onClick={()=>navigate("/edit-profile")}
-          className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm"
-        >
-          ← Back to Profile
-        </button>
-
-        <div className="text-right">
-
-          <h2 className="text-lg font-bold text-gray-800">
-            {toUserName}
-          </h2>
-
-          <p className="text-sm text-gray-500">
-            {toUserEmail}
-          </p>
-
-          <div className="flex gap-2 justify-end mt-2">
-
-            <button
-              onClick={()=>setShowRating(true)}
-              className="bg-yellow-500 text-white px-3 py-1 rounded-md text-sm"
-            >
-              ⭐ Rate Mentor
-            </button>
-
-            <button
-              onClick={scheduleMeeting}
-              className="bg-purple-600 text-white px-3 py-1 rounded-md text-sm"
-            >
-              📅 Schedule Meeting
-            </button>
-
+          <div style={{ textAlign: "center" }}>
+            <p style={{ fontWeight: 700, fontSize: 15 }}>{toUserName}</p>
+            <p style={{ color: "var(--text-muted)", fontSize: 12 }}>{toUserEmail}</p>
           </div>
 
+          <div className="flex gap-2">
+            <button onClick={() => setShowRating(true)} style={{
+              padding: "7px 12px", borderRadius: 8, fontSize: 12, cursor: "pointer", fontWeight: 500,
+              background: "#f59e0b15", color: "var(--amber)", border: "1px solid #f59e0b25",
+              display: "flex", alignItems: "center", gap: 5
+            }}>
+              <FaStar size={11} /> Rate
+            </button>
+            <button onClick={scheduleMeeting} style={{
+              padding: "7px 12px", borderRadius: 8, fontSize: 12, cursor: "pointer", fontWeight: 500,
+              background: "var(--accent-glow)", color: "var(--accent)", border: "1px solid #7c6af725",
+              display: "flex", alignItems: "center", gap: 5
+            }}>
+              <FaCalendarAlt size={11} /> Schedule
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Chat Box */}
-      <div className="max-w-xl mx-auto bg-white rounded-xl shadow p-4 min-h-[300px] flex flex-col justify-between">
-
-        <div className="overflow-y-auto max-h-[300px] mb-4">
-
+      {/* Chat area */}
+      <main style={{ flex: 1, display: "flex", flexDirection: "column", maxWidth: 700, width: "100%", margin: "0 auto", padding: "16px" }}>
+        <div style={{
+          flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8,
+          padding: "8px 0", minHeight: "60vh"
+        }}>
           {messages.length === 0 ? (
-            <p className="text-gray-400">No messages yet</p>
+            <div style={{ textAlign: "center", marginTop: "auto", marginBottom: "auto", paddingTop: 60 }}>
+              <p style={{ fontSize: 32, marginBottom: 10 }}>💬</p>
+              <p style={{ color: "var(--text-muted)", fontSize: 14 }}>No messages yet. Start the conversation!</p>
+            </div>
           ) : (
-            <ul className="space-y-2">
-
-              {messages.map((msg,index)=>(
-                <li
-                  key={index}
-                  className={msg.sender === currentUser._id ? "text-right":"text-left"}
-                >
-                  <span
-                    className={`inline-block px-3 py-2 rounded-lg ${
-                      msg.sender === currentUser._id
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 text-gray-800"
-                    }`}
-                  >
+            messages.map((msg, index) => {
+              const isOwn = msg.sender === currentUser._id;
+              return (
+                <div key={index} style={{ display: "flex", justifyContent: isOwn ? "flex-end" : "flex-start" }}>
+                  <div style={{
+                    maxWidth: "70%", padding: "10px 14px",
+                    borderRadius: isOwn ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
+                    background: isOwn ? "var(--accent)" : "var(--bg-surface)",
+                    border: isOwn ? "none" : "1px solid var(--border)",
+                    fontSize: 14, lineHeight: 1.5
+                  }}>
                     {msg.content}
-                  </span>
-                </li>
-              ))}
-
-            </ul>
+                  </div>
+                </div>
+              );
+            })
           )}
-
+          <div ref={bottomRef} />
         </div>
 
         {/* Input */}
-        <div className="flex flex-col sm:flex-row gap-2">
-
+        <div style={{
+          display: "flex", gap: 10, padding: "12px 0",
+          borderTop: "1px solid var(--border)", marginTop: 8
+        }}>
           <input
             value={text}
-            onChange={(e)=>setText(e.target.value)}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder="Type a message..."
-            className="flex-1 px-4 py-2 border rounded-md"
+            className="ss-input"
+            style={{ flex: 1, padding: "11px 14px", fontSize: 14 }}
           />
-
           <button
             onClick={handleSend}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md"
+            className="btn-primary"
+            style={{ padding: "11px 18px", borderRadius: 10, display: "flex", alignItems: "center", gap: 6 }}
           >
-            Send
+            <FaPaperPlane size={13} />
           </button>
-
         </div>
-
-      </div>
-
+      </main>
     </div>
   );
 };
