@@ -1,307 +1,201 @@
 import React, { useRef, useState } from "react";
-import { FaExchangeAlt, FaLinkedin } from "react-icons/fa";
+import { FaExchangeAlt, FaLinkedin, FaArrowRight, FaCheck } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const featuresRef = useRef(null);
-  const exploreRef = useRef(null);
-  const navigate = useNavigate();
-
+  const exploreRef  = useRef(null);
+  const navigate    = useNavigate();
   const [showPopup, setShowPopup] = useState(false);
-
-  const scrollToFeatures = () =>
-    featuresRef.current?.scrollIntoView({ behavior: "smooth" });
-  const scrollToExplore = () =>
-    exploreRef.current?.scrollIntoView({ behavior: "smooth" });
-
-  const handleFeatureClick = () => {
-    setShowPopup(true);
-  };
-
-  const closePopup = () => {
-    setShowPopup(false);
-  };
-
-  const goToSignup = () => {
-    navigate("/signup");
-  };
+  const scrollTo = r => r.current?.scrollIntoView({ behavior: "smooth" });
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-pink-200 via-pink-100 to-yellow-100 font-sans text-gray-900 transition duration-300">
-      {/* Navbar */}
-      <div className="w-full flex justify-between items-center px-4 sm:px-6 py-4">
-        <div className="flex items-center gap-2 text-blue-600 font-bold text-xl sm:text-2xl">
-          <FaExchangeAlt className="text-pink-500 text-2xl sm:text-3xl" />
-          <span className="tracking-wide text-lg sm:text-xl">
-            Swap<span className="text-pink-500">Skill</span>
-          </span>
-        </div>
+    <div style={{ minHeight: "100vh", background: "var(--bg-primary)", color: "var(--text-primary)", fontFamily: "'Inter', sans-serif" }}>
 
-        <div className="hidden sm:flex items-center gap-3 sm:gap-5 font-bold text-sm sm:text-base">
-          <button
-            onClick={scrollToFeatures}
-            className="hover:text-blue-600 px-2 sm:px-3"
-          >
-            Features
-          </button>
-          <button
-            onClick={scrollToExplore}
-            className="hover:text-blue-600 px-2 sm:px-3"
-          >
-            Explore
-          </button>
-          <button
-            onClick={() => navigate("/login")}
-            className="bg-pink-500 hover:bg-pink-600 text-white py-1.5 px-4 sm:py-2 sm:px-5 rounded-full shadow-md transition text-xs sm:text-sm"
-          >
-            Join Now
-          </button>
-        </div>
-
-        <div className="sm:hidden">
-          <button
-            onClick={() => navigate("/login")}
-            className="bg-pink-500 hover:bg-pink-600 text-white py-1.5 px-4 rounded-full shadow-md transition text-xs"
-          >
-            Join Now
-          </button>
-        </div>
-      </div>
-
-      {/* Hero Section */}
-      <section className="w-full min-h-[85vh] flex flex-col items-center justify-center text-center px-4 max-w-2xl mx-auto relative">
-        <div className="absolute top-1/3 left-1/2 transform -translate-x-1/2 -z-10 w-96 h-96 bg-pink-400 rounded-full opacity-30 blur-3xl animate-pulse dark:bg-pink-600"></div>
-
-        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold uppercase tracking-widest text-gray-800 dark:text-gray-300 mb-3">
-          Connect, Teach and Learn
-        </h2>
-
-        <h1 className="text-[42px] sm:text-6xl md:text-7xl lg:text-8xl font-black bg-gradient-to-r from-pink-500 via-red-500 to-yellow-600 text-transparent bg-clip-text drop-shadow-lg animate-fade-in-down">
-          TOGETHER
-        </h1>
-
-        <p className="mt-6 text-base sm:text-lg text-gray-700 dark:text-gray-200 leading-relaxed animate-fade-in-up">
-          Join a platform where students, freelancers, and professionals teach &
-          learn from each other.
-        </p>
-
-        <button
-          onClick={scrollToFeatures}
-          className="mt-10 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:scale-105 transform transition text-lg animate-fade-in-up"
-        >
-          🚀 Explore Features
-        </button>
-      </section>
-
-      {/* Features Section */}
-      <section
-        ref={featuresRef}
-        className="w-full px-4 sm:px-6 py-16 text-center"
-      >
-        <h2 className="text-2xl sm:text-4xl font-bold mb-12 leading-tight">
-          Features of Platform
-        </h2>
-        <div className="grid gap-8 md:grid-cols-2 max-w-6xl mx-auto">
-          <div className="bg-white/70 rounded-xl p-6 shadow-md border border-gray-200 text-left">
-            <h3 className="text-xl font-semibold text-blue-800 mb-4">
-              🎯 Goal / Purpose
-            </h3>
-            <ul className="space-y-3">
-              <li className="bg-white rounded-lg p-3 shadow-sm">
-                ✔ Help users teach skills they know
-              </li>
-              <li className="bg-white rounded-lg p-3 shadow-sm">
-                ✔ Let others learn skills for free
-              </li>
-              <li className="bg-white rounded-lg p-3 shadow-sm">
-                ✔ Build a community of mutual learning
-              </li>
-              <li className="bg-white rounded-lg p-3 shadow-sm">
-                ✔ Open to everyone (students, freelancers, professionals)
-              </li>
-            </ul>
+      {/* ── Navbar ── */}
+      <nav className="ss-nav" style={{ position: "sticky", top: 0, zIndex: 50, display: "flex", alignItems: "center", padding: "0 28px", height: 60 }}>
+        {/* Logo */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 10, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px var(--accent-glow)" }}>
+            <FaExchangeAlt style={{ color: "#fff", fontSize: 14 }} />
           </div>
-          <div className="bg-white/70 rounded-xl p-6 shadow-md border border-gray-200 text-left">
-            <h3 className="text-xl font-semibold text-blue-800 mb-4">
-              🧑‍🏫💻 Use Case Examples
-            </h3>
-            <ul className="space-y-3 list-disc list-inside text-gray-800 text-base leading-relaxed">
-              <li className="bg-white rounded-lg p-3 shadow-sm">
-                <strong>John</strong> knows UI/UX — he teaches it to{" "}
-                <strong>Priya</strong>.
-              </li>
-              <li className="bg-white rounded-lg p-3 shadow-sm">
-                <strong>Nimish</strong> teaches Java to <strong>Ali</strong>,
-                who helps her with Python basics.
-              </li>
-              <li className="bg-white rounded-lg p-3 shadow-sm">
-                <strong>Ajay</strong> helps <strong>Ram</strong> with Figma, and
-                learns React in exchange.
-              </li>
-            </ul>
-          </div>
+          <span className="grad-text" style={{ fontWeight: 800, fontSize: 17, letterSpacing: "-0.04em" }}>SwapSkill</span>
         </div>
-        <div className="mt-10">
-          <button
-            onClick={scrollToExplore}
-            className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-8 rounded-lg font-semibold shadow transition"
-          >
-            Explore More
-          </button>
+
+        <div style={{ flex: 1 }} />
+
+        {/* Nav links + CTAs */}
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <button onClick={() => scrollTo(featuresRef)} style={{ background: "none", border: "none", color: "var(--text-secondary)", fontSize: 13, fontWeight: 500, cursor: "pointer", padding: "6px 12px", borderRadius: 8, fontFamily: "inherit", transition: "background 0.15s, color 0.15s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "var(--bg-surface)"; e.currentTarget.style.color = "var(--text-primary)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--text-secondary)"; }}>Features</button>
+          <button onClick={() => scrollTo(exploreRef)} style={{ background: "none", border: "none", color: "var(--text-secondary)", fontSize: 13, fontWeight: 500, cursor: "pointer", padding: "6px 12px", borderRadius: 8, fontFamily: "inherit", transition: "background 0.15s, color 0.15s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "var(--bg-surface)"; e.currentTarget.style.color = "var(--text-primary)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "var(--text-secondary)"; }}>Explore</button>
+          <div style={{ width: 1, height: 18, background: "var(--border)", margin: "0 6px" }} />
+          <button onClick={() => navigate("/login")}  className="btn-outline" style={{ padding: "7px 16px", borderRadius: 9 }}>Log in</button>
+          <button onClick={() => navigate("/signup")} className="btn-primary" style={{ padding: "7px 16px", borderRadius: 9 }}>Sign up free</button>
+        </div>
+      </nav>
+
+      {/* ── Hero ── */}
+      <section style={{ position: "relative", overflow: "hidden", padding: "90px 32px 72px", textAlign: "center" }}>
+        {/* Pink blob bg */}
+        <div style={{ position: "absolute", top: -80, left: "50%", transform: "translateX(-50%)", width: 700, height: 500, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(233,30,140,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", top: 40, left: "10%", width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(156,39,176,0.05) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", top: 20, right: "8%", width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(233,30,140,0.05) 0%, transparent 70%)", pointerEvents: "none" }} />
+
+        <div style={{ position: "relative", maxWidth: 680, margin: "0 auto" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "5px 14px", borderRadius: 20, border: "1px solid var(--accent-border)", background: "var(--accent-dim)", marginBottom: 28 }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--accent)", display: "inline-block" }} />
+            <span style={{ fontSize: 12, color: "var(--accent)", fontWeight: 600 }}>Peer-to-peer skill exchange · Free forever</span>
+          </div>
+
+          <h1 style={{ fontSize: "clamp(2.6rem, 6vw, 4.2rem)", fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.08, margin: "0 0 18px", color: "var(--text-primary)" }}>
+            Trade skills.<br />
+            <span className="grad-text">Grow together.</span>
+          </h1>
+
+          <p style={{ fontSize: 17, color: "var(--text-secondary)", lineHeight: 1.7, margin: "0 0 36px", maxWidth: 440, marginLeft: "auto", marginRight: "auto" }}>
+            Connect with students, freelancers, and professionals. Teach what you know, learn what you don't.
+          </p>
+
+          <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+            <button onClick={() => navigate("/signup")} className="btn-primary"
+              style={{ padding: "12px 26px", fontSize: 15, borderRadius: 10, display: "inline-flex", alignItems: "center", gap: 8 }}>
+              Get started free <FaArrowRight size={13} />
+            </button>
+            <button onClick={() => scrollTo(exploreRef)} className="btn-outline"
+              style={{ padding: "12px 26px", fontSize: 15, borderRadius: 10 }}>
+              See how it works
+            </button>
+          </div>
+
+          {/* Stats */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0, marginTop: 56, border: "1px solid var(--border)", borderRadius: 14, background: "#fff", overflow: "hidden", maxWidth: 480, marginLeft: "auto", marginRight: "auto" }}>
+            {[["500+", "Users"], ["1.2k+", "Skills shared"], ["300+", "Connections"]].map(([n, l], i) => (
+              <div key={l} style={{ flex: 1, textAlign: "center", padding: "18px 12px", borderRight: i < 2 ? "1px solid var(--border)" : "none" }}>
+                <p style={{ fontSize: 22, fontWeight: 800, color: "var(--accent)", margin: 0, letterSpacing: "-0.03em" }}>{n}</p>
+                <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "3px 0 0", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.05em" }}>{l}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Explore Section */}
-      <section
-        ref={exploreRef}
-        className="w-full px-4 sm:px-6 py-16 text-center"
-      >
-        <h2 className="text-2xl sm:text-4xl font-bold mb-8 leading-tight">
-          Explore Opportunities
-        </h2>
-        <p className="max-w-xl mx-auto text-base sm:text-lg mb-12">
-          Find learners and mentors. Start exchanging your skills today!
-        </p>
+      {/* ── Features ── */}
+      <section ref={featuresRef} style={{ maxWidth: 960, margin: "0 auto", padding: "60px 32px" }}>
+        <div style={{ marginBottom: 40 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: "var(--accent)", letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 10px" }}>Platform features</p>
+          <h2 style={{ fontSize: "clamp(1.7rem, 3vw, 2.3rem)", fontWeight: 800, letterSpacing: "-0.03em", margin: 0 }}>Everything you need to exchange skills</h2>
+        </div>
 
-        <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 max-w-6xl mx-auto">
-          {/* Card 1 */}
-          <div className="bg-white/80 border border-gray-200 p-6 rounded-xl shadow-md hover:shadow-xl transition transform hover:scale-[1.02] text-left">
-            <div className="flex items-center gap-4 mb-4">
-              <img
-                src="https://randomuser.me/api/portraits/men/32.jpg"
-                alt="User 1"
-                className="w-16 h-16 rounded-full border-2 border-blue-500"
-              />
-              <div>
-                <h3 className="text-xl font-semibold">Ravi Mehra</h3>
-                <p className="text-sm text-gray-500">Student</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
+          {[
+            { icon: "↔️", title: "Send & receive requests",  desc: "Request to learn or offer to teach. Full accept/decline flow." },
+            { icon: "💬", title: "Private messaging",        desc: "Chat directly with skill partners once connected." },
+            { icon: "🖊️",  title: "Real-time whiteboard",    desc: "Teach visually with a collaborative canvas and sticky notes." },
+            { icon: "⭐", title: "Mentor ratings",           desc: "Rate sessions and build your reputation in the community." },
+            { icon: "🔍", title: "Skill discovery",          desc: "Search by skill — find who teaches React, Python, DSA and more." },
+            { icon: "🔒", title: "Secure auth",              desc: "JWT authentication, protected routes, persistent sessions." },
+          ].map(({ icon, title, desc }) => (
+            <div key={title} className="ss-card" style={{ padding: "22px 22px" }}>
+              <span style={{ fontSize: 22, display: "block", marginBottom: 12 }}>{icon}</span>
+              <p style={{ fontWeight: 700, fontSize: 14, margin: "0 0 6px", letterSpacing: "-0.01em" }}>{title}</p>
+              <p style={{ fontSize: 13, color: "var(--text-secondary)", margin: 0, lineHeight: 1.6 }}>{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Explore ── */}
+      <section ref={exploreRef} style={{ maxWidth: 960, margin: "0 auto", padding: "20px 32px 80px" }}>
+        <div style={{ marginBottom: 36 }}>
+          <p style={{ fontSize: 11, fontWeight: 700, color: "var(--accent)", letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 10px" }}>Explore</p>
+          <h2 style={{ fontSize: "clamp(1.7rem, 3vw, 2.3rem)", fontWeight: 800, letterSpacing: "-0.03em", margin: "0 0 8px" }}>Find your skill partner</h2>
+          <p style={{ fontSize: 14, color: "var(--text-secondary)", margin: 0 }}>Browse learners and mentors. Start exchanging today.</p>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))", gap: 12, marginBottom: 48 }}>
+          {[
+            { name: "Ravi Mehra",  role: "Student",   seed: "Ravi",  teaches: "Data Structures, Java", learns: "UI/UX, JavaScript" },
+            { name: "Neha Sharma", role: "Freelancer", seed: "Neha",  teaches: "UI/UX, Figma",          learns: "DSA, Python"       },
+            { name: "Arjun Nair",  role: "Developer",  seed: "Arjun", teaches: "React, Node.js",         learns: "ML, Python"        },
+          ].map(({ name, role, seed, teaches, learns }) => (
+            <div key={name} className="ss-card" style={{ padding: "20px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 11, marginBottom: 16 }}>
+                <img src={`https://api.dicebear.com/7.x/initials/svg?seed=${seed}&backgroundColor=e91e8c&fontColor=ffffff`}
+                  alt={name} style={{ width: 44, height: 44, borderRadius: "50%", border: "2px solid var(--accent-border)" }} />
+                <div>
+                  <p style={{ fontWeight: 700, fontSize: 14, margin: 0 }}>{name}</p>
+                  <p style={{ fontSize: 11, color: "var(--text-muted)", margin: 0 }}>{role}</p>
+                </div>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 7, marginBottom: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                  <span className="ss-tag ss-tag-green">Teaches</span>
+                  <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{teaches}</span>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                  <span className="ss-tag ss-tag-blue">Learns</span>
+                  <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{learns}</span>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 7 }}>
+                <button onClick={() => setShowPopup(true)} className="btn-primary" style={{ flex: 1, padding: "8px 0", fontSize: 12 }}>Learn</button>
+                <button onClick={() => setShowPopup(true)} className="btn-green"   style={{ flex: 1, padding: "8px 0", fontSize: 12 }}>Teach</button>
               </div>
             </div>
-            <p>
-              <strong>Knows:</strong> Data Structures, Java
-            </p>
-            <p>
-              <strong>Wants to Learn:</strong> UI/UX, JavaScript
-            </p>
-            <div className="mt-4 flex gap-3 flex-wrap">
-              <button
-                onClick={handleFeatureClick}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition"
-              >
-                Request to Learn
-              </button>
-              <button
-                onClick={handleFeatureClick}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md transition"
-              >
-                Offer to Teach
-              </button>
-            </div>
-          </div>
-
-          {/* Card 2 */}
-          <div className="bg-white/80 border border-gray-200 p-6 rounded-xl shadow-md hover:shadow-xl transition transform hover:scale-[1.02] text-left">
-            <div className="flex items-center gap-4 mb-4">
-              <img
-                src="https://randomuser.me/api/portraits/women/44.jpg"
-                alt="User 2"
-                className="w-16 h-16 rounded-full border-2 border-pink-500"
-              />
-              <div>
-                <h3 className="text-xl font-semibold">Neha Sharma</h3>
-                <p className="text-sm text-gray-500">Freelancer</p>
-              </div>
-            </div>
-            <p>
-              <strong>Knows:</strong> UI/UX Design, Figma
-            </p>
-            <p>
-              <strong>Wants to Learn:</strong> DSA, Python
-            </p>
-            <div className="mt-4 flex gap-3 flex-wrap">
-              <button
-                onClick={handleFeatureClick}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition"
-              >
-                Request to Learn
-              </button>
-              <button
-                onClick={handleFeatureClick}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md transition"
-              >
-                Offer to Teach
-              </button>
-            </div>
-          </div>
+          ))}
         </div>
 
-        <div className="w-full flex justify-center py-12">
-          <button
-            onClick={() => navigate("/login")}
-            className="bg-pink-500 hover:bg-pink-600 w-11/12 sm:w-3/4 md:w-[600px] text-white font-semibold py-3 px-8 rounded-full shadow-lg transition text-lg"
-          >
-            Join Now and Start Swapping Skills
+        {/* CTA block */}
+        <div style={{ textAlign: "center", padding: "52px 32px", border: "1px solid var(--border)", borderRadius: 18, background: "#fff", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: -60, left: "50%", transform: "translateX(-50%)", width: 500, height: 300, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(233,30,140,0.06) 0%, transparent 70%)", pointerEvents: "none" }} />
+          <p style={{ fontSize: 11, fontWeight: 700, color: "var(--accent)", letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 12px" }}>Ready to start?</p>
+          <h3 style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", margin: "0 0 8px" }}>Join SwapSkill today</h3>
+          <p style={{ fontSize: 14, color: "var(--text-secondary)", margin: "0 0 24px" }}>Free forever. No credit card required.</p>
+          <div style={{ display: "flex", gap: 16, justifyContent: "center", marginBottom: 28, flexWrap: "wrap" }}>
+            {["No fees ever", "Any skill", "Any level"].map(t => (
+              <div key={t} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--text-secondary)" }}>
+                <FaCheck style={{ color: "var(--green)", fontSize: 11 }} /> {t}
+              </div>
+            ))}
+          </div>
+          <button onClick={() => navigate("/signup")} className="btn-primary"
+            style={{ padding: "13px 32px", fontSize: 15, borderRadius: 10, display: "inline-flex", alignItems: "center", gap: 8 }}>
+            Get started free <FaArrowRight size={13} />
           </button>
         </div>
+      </section>
 
-        {/* Popup Modal */}
-        {showPopup && (
-          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40">
-            <div className="bg-white p-6 rounded-xl shadow-xl w-[90%] max-w-sm text-center">
-              <h3 className="text-xl font-semibold mb-4 text-gray-800">
-                Hold on!
-              </h3>
-
-              <p className="mb-6 text-gray-600">
-                Click on{" "}
-                <strong
-                  className="text-blue-600 cursor-pointer"
-                  onClick={goToSignup}
-                >
-                  Join Now
-                </strong>{" "}
-                to use the features of this website.
-              </p>
-
-              <button
-                onClick={closePopup}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full"
-              >
-                Close
-              </button>
+      {/* Popup */}
+      {showPopup && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(26,10,18,0.45)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100 }}>
+          <div className="ss-card" style={{ padding: 32, width: 340, textAlign: "center", borderRadius: 18, background: "#fff" }}>
+            <p style={{ fontWeight: 700, fontSize: 16, margin: "0 0 8px" }}>Create an account first</p>
+            <p style={{ fontSize: 13, color: "var(--text-secondary)", margin: "0 0 24px", lineHeight: 1.6 }}>Sign up free to send requests and connect with skill partners.</p>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button onClick={() => setShowPopup(false)} className="btn-outline" style={{ flex: 1 }}>Cancel</button>
+              <button onClick={() => navigate("/signup")} className="btn-primary" style={{ flex: 1 }}>Sign up free</button>
             </div>
           </div>
-        )}
-      </section>
+        </div>
+      )}
 
       {/* Footer */}
-      <footer className="w-full bg-gray-900 text-white py-8 px-6 flex flex-col sm:flex-row justify-between items-center text-sm sm:text-base">
-        <div className="mb-4 sm:mb-0 flex items-center gap-2 text-center sm:text-left">
-          <FaLinkedin className="text-blue-400 text-lg" />
-          <span>
-            Developed by{" "}
-            <a
-              href="https://www.linkedin.com/in/nekalsingh/"
-              className="text-blue-400 hover:text-blue-300 transition no-underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Nekal Singh
-            </a>
+      <footer style={{ borderTop: "1px solid var(--border)", padding: "22px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, background: "#fff" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+          <FaExchangeAlt style={{ color: "var(--accent)", fontSize: 14 }} />
+          <span className="grad-text" style={{ fontWeight: 800, fontSize: 14, letterSpacing: "-0.02em" }}>SwapSkill</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <FaLinkedin style={{ color: "#0077b5", fontSize: 14 }} />
+          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+            Built by <a href="https://www.linkedin.com/in/nekalsingh/" target="_blank" rel="noreferrer" style={{ color: "var(--accent)", textDecoration: "none", fontWeight: 500 }}>Nekal Singh</a>
           </span>
         </div>
-        <div className="text-center sm:text-right">
-          <p>Any Suggestions?</p>
-          <a
-            href="mailto:nekalsingh987@gmail.com"
-            className="text-red-400 hover:text-red-300 transition"
-          >
-            nekalsingh987@gmail.com
-          </a>
-          <p className="mt-1 text-gray-400 text-xs">
-            © {new Date().getFullYear()} SwapSkill. All rights reserved.
-          </p>
-        </div>
+        <span style={{ fontSize: 11, color: "var(--text-muted)" }}>© {new Date().getFullYear()} SwapSkill</span>
       </footer>
     </div>
   );
