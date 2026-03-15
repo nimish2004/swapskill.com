@@ -92,7 +92,7 @@ const Whiteboard = ({ roomId, currentUserId }) => {
       sock.off("sticky-move");
       sock.off("sticky-remove");
     };
-  }, [roomId]);
+  }, [clearLocal, roomId]);
 
   const resize = (canvas) => {
     canvas.width  = canvas.offsetWidth;
@@ -167,7 +167,7 @@ const Whiteboard = ({ roomId, currentUserId }) => {
   const onPointerUp = () => { drawing.current = false; lastPt.current = null; };
 
   // ── Clear ──
-  const clearLocal = () => {
+  const clearLocal = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx    = canvas.getContext("2d");
     ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -175,12 +175,12 @@ const Whiteboard = ({ roomId, currentUserId }) => {
     ctx.fillRect(0,0,canvas.width,canvas.height);
     drawGrid(ctx,canvas.width,canvas.height);
     setStickies([]);
-  };
+  }, []);
 
-  const clearBoard = () => {
+  function clearBoard() {
     clearLocal();
     getSocket().emit("clear-board", { roomId });
-  };
+  }
 
   // ── Download ──
   const downloadBoard = () => {
@@ -393,7 +393,9 @@ const ChatPanel = ({ toUserId, toUserName, token, currentUser }) => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setMessages(res.data.messages || []);
-      } catch {}
+      } catch {
+        console.error("Failed to fetch messages");
+      }
     })();
   }, [toUserId, token]);
 
@@ -409,7 +411,9 @@ const ChatPanel = ({ toUserId, toUserName, token, currentUser }) => {
       );
       setMessages(p => [...p, { sender: currentUser._id, receiver: toUserId, content: text }]);
       setText("");
-    } catch {}
+    } catch {
+      console.error("Failed to send message");
+    }
   };
 
   return (
@@ -497,7 +501,9 @@ const ChatPage = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setShowRating(false); setRating(0);
-    } catch {}
+    } catch {
+      console.error("Failed to submit rating");
+    }
   };
 
   const scheduleMeeting = () => {
