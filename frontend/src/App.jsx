@@ -7,8 +7,9 @@ import Dashboard from "./components/Dashboard";
 import TokenLoader from "./components/TokenLoader";
 import EditProfile from "./components/EditProfile";
 import ProtectedRoute from "./components/ProtectedRoute";
-import PublicRoute from "./components/PublicRoute"; // 👈
+import PublicRoute from "./components/PublicRoute";
 import ChatPage from "./components/ChatPage";
+import GroupSessionPage from "./components/GroupSessionPage";
 
 
 function App() {
@@ -60,6 +61,7 @@ function App() {
           }
         />
         <Route path="/chat" element={<ChatPage />} />
+        <Route path="/group-session" element={<GroupSessionPage />} />
       </Routes>
     </>
   );
