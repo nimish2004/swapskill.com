@@ -61,39 +61,15 @@ const Whiteboard = ({ roomId, currentUserId }) => {
   }, []);
 
   // ── Socket listeners ──
-  useEffect(() => {
-    const sock = getSocket();
-    sock.emit("join-whiteboard", { roomId });
-
-    // Remote stroke
-    sock.on("draw-stroke", ({ x0,y0,x1,y1,color:c,brushSize:bs,tool:t }) => {
-      renderStroke(x0,y0,x1,y1,c,bs,t);
-    });
-
-    // Remote clear
-    sock.on("clear-board", () => {
-      clearLocal();
-    });
-
-    // Sticky events from remote
-    sock.on("sticky-add",    ({ sticky }) => setStickies(p => [...p, sticky]));
-    sock.on("sticky-update", ({ id, text }) =>
-      setStickies(p => p.map(s => s.id===id ? {...s,text} : s)));
-    sock.on("sticky-move",   ({ id, x, y }) =>
-      setStickies(p => p.map(s => s.id===id ? {...s,x,y} : s)));
-    sock.on("sticky-remove", ({ id }) =>
-      setStickies(p => p.filter(s => s.id!==id)));
-
-    return () => {
-      sock.off("draw-stroke");
-      sock.off("clear-board");
-      sock.off("sticky-add");
-      sock.off("sticky-update");
-      sock.off("sticky-move");
-      sock.off("sticky-remove");
-    };
-  }, [clearLocal, roomId]);
-
+  const clearLocal = useCallback(() => {
+  const canvas = canvasRef.current;
+  const ctx    = canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#0d1117";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  drawGrid(ctx,canvas.width,canvas.height);
+  setStickies([]);
+}, []);
   const resize = (canvas) => {
     canvas.width  = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
@@ -167,16 +143,7 @@ const Whiteboard = ({ roomId, currentUserId }) => {
   const onPointerUp = () => { drawing.current = false; lastPt.current = null; };
 
   // ── Clear ──
-  const clearLocal = useCallback(() => {
-    const canvas = canvasRef.current;
-    const ctx    = canvas.getContext("2d");
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle = "#0d1117";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    drawGrid(ctx,canvas.width,canvas.height);
-    setStickies([]);
-  }, []);
-
+  
   function clearBoard() {
     clearLocal();
     getSocket().emit("clear-board", { roomId });
