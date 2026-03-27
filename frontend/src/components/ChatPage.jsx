@@ -148,6 +148,49 @@ const Whiteboard = ({ roomId, currentUserId }) => {
     clearLocal();
     getSocket().emit("clear-board", { roomId });
   }
+  // ONLY REALTIME FIXES ADDED — NO UI CHANGES
+
+// 🔥 ADD THIS inside Whiteboard (after clearLocal)
+
+useEffect(() => {
+  const socket = getSocket();
+
+  socket.on("draw-stroke", (data) => {
+    renderStroke(
+      data.x0, data.y0,
+      data.x1, data.y1,
+      data.color,
+      data.brushSize,
+      data.tool
+    );
+  });
+
+  socket.on("clear-board", () => {
+    clearLocal();
+  });
+
+  socket.on("sticky-add", ({ sticky }) => {
+    setStickies(prev => [...prev, sticky]);
+  });
+
+  socket.on("sticky-update", ({ id, text }) => {
+    setStickies(prev =>
+      prev.map(s => s.id === id ? { ...s, text } : s)
+    );
+  });
+
+  socket.on("sticky-remove", ({ id }) => {
+    setStickies(prev => prev.filter(s => s.id !== id));
+  });
+
+  socket.on("sticky-move", ({ id, x, y }) => {
+    setStickies(prev =>
+      prev.map(s => s.id === id ? { ...s, x, y } : s)
+    );
+  });
+
+  return () => socket.off();
+}, []);
 
   // ── Download ──
   const downloadBoard = () => {
@@ -368,20 +411,46 @@ const ChatPanel = ({ toUserId, toUserName, token, currentUser }) => {
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior:"smooth" }); }, [messages]);
 
-  const handleSend = async () => {
-    if (!text.trim()) return;
-    try {
-      await axios.post(
-        "https://swapskill-com.onrender.com/api/user/send-message",
-        { toUserId, text },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setMessages(p => [...p, { sender: currentUser._id, receiver: toUserId, content: text }]);
-      setText("");
-    } catch {
-      console.error("Failed to send message");
-    }
-  };
+  // 🔥 ADD THIS in ChatPanel (new useEffect)
+
+useEffect(() => {
+  const socket = getSocket();
+
+  socket.on("receive-message", (msg) => {
+    setMessages(prev => [...prev, msg]);
+  });
+
+  return () => socket.off("receive-message");
+}, []);
+  // 🔥 UPDATE ChatPanel → handleSend REPLACE
+
+const handleSend = async () => {
+  if (!text.trim()) return;
+
+  try {
+    await axios.post(
+      "https://swapskill-com.onrender.com/api/user/send-message",
+      { toUserId, text },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    const msg = {
+      sender: currentUser._id,
+      receiver: toUserId,
+      content: text,
+    };
+
+    setMessages(prev => [...prev, msg]);
+
+    // 🔥 REALTIME
+    const socket = getSocket();
+    socket.emit("send-message", msg);
+
+    setText("");
+  } catch {
+    console.error("Failed to send message");
+  }
+};
 
   return (
     <div style={{ display:"flex", flexDirection:"column", height:"100%", background:"var(--bg-card)" }}>
@@ -458,6 +527,18 @@ const ChatPage = () => {
 
   // Derive stable room id from sorted user ids
   const roomId = currentUser && toUserId ? makeRoomId(currentUser._id, toUserId) : null;
+  // 🔥 ADD THIS inside ChatPage (after roomId)
+
+useEffect(() => {
+  if (!roomId) return;
+
+  const socket = getSocket();
+  socket.emit("join-room", { roomId });
+
+  return () => {
+    socket.emit("leave-room", { roomId });
+  };
+}, [roomId]);
 
   const submitRating = async () => {
     if (!rating) return;
