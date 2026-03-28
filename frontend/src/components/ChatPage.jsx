@@ -61,39 +61,15 @@ const Whiteboard = ({ roomId, currentUserId }) => {
   }, []);
 
   // ── Socket listeners ──
-  useEffect(() => {
-    const sock = getSocket();
-    sock.emit("join-whiteboard", { roomId });
-
-    // Remote stroke
-    sock.on("draw-stroke", ({ x0,y0,x1,y1,color:c,brushSize:bs,tool:t }) => {
-      renderStroke(x0,y0,x1,y1,c,bs,t);
-    });
-
-    // Remote clear
-    sock.on("clear-board", () => {
-      clearLocal();
-    });
-
-    // Sticky events from remote
-    sock.on("sticky-add",    ({ sticky }) => setStickies(p => [...p, sticky]));
-    sock.on("sticky-update", ({ id, text }) =>
-      setStickies(p => p.map(s => s.id===id ? {...s,text} : s)));
-    sock.on("sticky-move",   ({ id, x, y }) =>
-      setStickies(p => p.map(s => s.id===id ? {...s,x,y} : s)));
-    sock.on("sticky-remove", ({ id }) =>
-      setStickies(p => p.filter(s => s.id!==id)));
-
-    return () => {
-      sock.off("draw-stroke");
-      sock.off("clear-board");
-      sock.off("sticky-add");
-      sock.off("sticky-update");
-      sock.off("sticky-move");
-      sock.off("sticky-remove");
-    };
-  }, [roomId]);
-
+  const clearLocal = useCallback(() => {
+  const canvas = canvasRef.current;
+  const ctx    = canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#0d1117";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  drawGrid(ctx,canvas.width,canvas.height);
+  setStickies([]);
+}, []);
   const resize = (canvas) => {
     canvas.width  = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
@@ -167,20 +143,54 @@ const Whiteboard = ({ roomId, currentUserId }) => {
   const onPointerUp = () => { drawing.current = false; lastPt.current = null; };
 
   // ── Clear ──
-  const clearLocal = () => {
-    const canvas = canvasRef.current;
-    const ctx    = canvas.getContext("2d");
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle = "#0d1117";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    drawGrid(ctx,canvas.width,canvas.height);
-    setStickies([]);
-  };
-
-  const clearBoard = () => {
+  
+  function clearBoard() {
     clearLocal();
     getSocket().emit("clear-board", { roomId });
-  };
+  }
+  // ONLY REALTIME FIXES ADDED — NO UI CHANGES
+
+// 🔥 ADD THIS inside Whiteboard (after clearLocal)
+
+useEffect(() => {
+  const socket = getSocket();
+
+  socket.on("draw-stroke", (data) => {
+    renderStroke(
+      data.x0, data.y0,
+      data.x1, data.y1,
+      data.color,
+      data.brushSize,
+      data.tool
+    );
+  });
+
+  socket.on("clear-board", () => {
+    clearLocal();
+  });
+
+  socket.on("sticky-add", ({ sticky }) => {
+    setStickies(prev => [...prev, sticky]);
+  });
+
+  socket.on("sticky-update", ({ id, text }) => {
+    setStickies(prev =>
+      prev.map(s => s.id === id ? { ...s, text } : s)
+    );
+  });
+
+  socket.on("sticky-remove", ({ id }) => {
+    setStickies(prev => prev.filter(s => s.id !== id));
+  });
+
+  socket.on("sticky-move", ({ id, x, y }) => {
+    setStickies(prev =>
+      prev.map(s => s.id === id ? { ...s, x, y } : s)
+    );
+  });
+
+  return () => socket.off();
+}, []);
 
   // ── Download ──
   const downloadBoard = () => {
@@ -393,24 +403,54 @@ const ChatPanel = ({ toUserId, toUserName, token, currentUser }) => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setMessages(res.data.messages || []);
-      } catch {}
+      } catch {
+        console.error("Failed to fetch messages");
+      }
     })();
   }, [toUserId, token]);
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior:"smooth" }); }, [messages]);
 
-  const handleSend = async () => {
-    if (!text.trim()) return;
-    try {
-      await axios.post(
-        "https://swapskill-com.onrender.com/api/user/send-message",
-        { toUserId, text },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setMessages(p => [...p, { sender: currentUser._id, receiver: toUserId, content: text }]);
-      setText("");
-    } catch {}
-  };
+  // 🔥 ADD THIS in ChatPanel (new useEffect)
+
+useEffect(() => {
+  const socket = getSocket();
+
+  socket.on("receive-message", (msg) => {
+    setMessages(prev => [...prev, msg]);
+  });
+
+  return () => socket.off("receive-message");
+}, []);
+  // 🔥 UPDATE ChatPanel → handleSend REPLACE
+
+const handleSend = async () => {
+  if (!text.trim()) return;
+
+  try {
+    await axios.post(
+      "https://swapskill-com.onrender.com/api/user/send-message",
+      { toUserId, text },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    const msg = {
+      sender: currentUser._id,
+      receiver: toUserId,
+      content: text,
+    };
+
+    setMessages(prev => [...prev, msg]);
+
+    // 🔥 REALTIME
+    const socket = getSocket();
+    socket.emit("send-message", msg);
+
+    setText("");
+  } catch {
+    console.error("Failed to send message");
+  }
+};
 
   return (
     <div style={{ display:"flex", flexDirection:"column", height:"100%", background:"var(--bg-card)" }}>
@@ -487,6 +527,18 @@ const ChatPage = () => {
 
   // Derive stable room id from sorted user ids
   const roomId = currentUser && toUserId ? makeRoomId(currentUser._id, toUserId) : null;
+  // 🔥 ADD THIS inside ChatPage (after roomId)
+
+useEffect(() => {
+  if (!roomId) return;
+
+  const socket = getSocket();
+  socket.emit("join-room", { roomId });
+
+  return () => {
+    socket.emit("leave-room", { roomId });
+  };
+}, [roomId]);
 
   const submitRating = async () => {
     if (!rating) return;
@@ -497,7 +549,9 @@ const ChatPage = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setShowRating(false); setRating(0);
-    } catch {}
+    } catch {
+      console.error("Failed to submit rating");
+    }
   };
 
   const scheduleMeeting = () => {

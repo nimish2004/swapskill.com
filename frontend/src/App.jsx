@@ -11,57 +11,25 @@ import PublicRoute from "./components/PublicRoute";
 import ChatPage from "./components/ChatPage";
 import GroupSessionPage from "./components/GroupSessionPage";
 
-
 function App() {
   return (
     <>
       <TokenLoader />
-      <Routes>
-        {/* 👇 Only show these when NOT logged in */}
-        <Route
-          path="/"
-          element={
-            <PublicRoute>
-              <Home />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <Login />
-            </PublicRoute>
-          }
-        />
-        <Route
-          path="/signup"
-          element={
-            <PublicRoute>
-              <Signup />
-            </PublicRoute>
-          }
-        />
 
-        {/* 👇 Only show when logged in */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/edit-profile"
-          element={
-            <ProtectedRoute>
-              <EditProfile />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/chat" element={<ChatPage />} />
-        <Route path="/group-session" element={<GroupSessionPage />} />
+      <Routes>
+        {/* PUBLIC */}
+        <Route path="/" element={<PublicRoute><Home /></PublicRoute>} />
+        <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+        <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+
+        {/* PROTECTED */}
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/edit-profile" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
+
+        {/* 🔥 FIXED */}
+        <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+        <Route path="/group-session" element={<ProtectedRoute><GroupSessionPage /></ProtectedRoute>} />
+
       </Routes>
     </>
   );
