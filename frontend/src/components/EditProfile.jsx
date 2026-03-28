@@ -10,7 +10,7 @@ import {
   FaExchangeAlt, FaSignOutAlt, FaArrowLeft,
   FaGraduationCap, FaChalkboardTeacher, FaStar,
   FaUserFriends, FaEdit, FaCheck, FaLinkedin,
-  FaGithub, FaGlobe, FaLightbulb,
+  FaGithub, FaGlobe, FaLightbulb, FaRupeeSign,
 } from "react-icons/fa";
 
 const API = "https://swapskill-com.onrender.com";
@@ -60,15 +60,16 @@ const EditProfile = () => {
   const user     = useSelector(s => s.user.userData);
   const token    = useSelector(s => s.user.token);
 
-  const [name,        setName]        = useState("");
-  const [canTeach,    setCanTeach]    = useState("");
-  const [wantToLearn, setWantToLearn] = useState("");
-  const [about,       setAbout]       = useState("");
-  const [linkedin,    setLinkedin]    = useState("");
-  const [github,      setGithub]      = useState("");
-  const [website,     setWebsite]     = useState("");
-  const [editing,     setEditing]     = useState(false);
-  const [stats,       setStats]       = useState({ connections: 0, avgRating: 0, totalRatings: 0 });
+  const [name,         setName]         = useState("");
+  const [canTeach,     setCanTeach]     = useState("");
+  const [wantToLearn,  setWantToLearn]  = useState("");
+  const [about,        setAbout]        = useState("");
+  const [linkedin,     setLinkedin]     = useState("");
+  const [github,       setGithub]       = useState("");
+  const [website,      setWebsite]      = useState("");
+  const [pricePerHour, setPricePerHour] = useState("");
+  const [editing,      setEditing]      = useState(false);
+  const [stats,        setStats]        = useState({ connections: 0, avgRating: 0, totalRatings: 0 });
 
   useEffect(() => {
     if (!user) return;
@@ -79,6 +80,7 @@ const EditProfile = () => {
     setLinkedin(user.linkedin || "");
     setGithub(user.github || "");
     setWebsite(user.website || "");
+    setPricePerHour(user.pricePerHour != null ? String(user.pricePerHour) : "");
 
     // fetch stats from accepted requests count + ratings
     axios.get(`${API}/api/user/myrequests`, {
@@ -88,7 +90,7 @@ const EditProfile = () => {
       setStats(prev => ({ ...prev, connections }));
     }).catch(() => {});
 
-    // get own rating summary from all users list
+    // get own rating summary + live pricePerHour from all users list
     axios.get(`${API}/api/user/all`).then(res => {
       const me = res.data.find(u => u._id === user._id);
       if (!me) return;
@@ -96,6 +98,11 @@ const EditProfile = () => {
       if (ratings.length > 0) {
         const avg = ratings.reduce((a, r) => a + (r.stars || 0), 0) / ratings.length;
         setStats(prev => ({ ...prev, avgRating: Number(avg.toFixed(1)), totalRatings: ratings.length }));
+      }
+      // Sync live price from DB (handles stale localStorage sessions)
+      if (me.pricePerHour != null) {
+        setPricePerHour(String(me.pricePerHour));
+        dispatch(setUserData({ ...user, pricePerHour: me.pricePerHour }));
       }
     }).catch(() => {});
   }, [user, token]);
@@ -105,7 +112,7 @@ const EditProfile = () => {
     try {
       const res = await axios.put(
         `${API}/api/auth/update`,
-        { name, canTeach, wantToLearn },
+        { name, canTeach, wantToLearn, pricePerHour: Number(pricePerHour) || 0 },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       dispatch(setUserData(res.data.user));
@@ -248,6 +255,28 @@ const EditProfile = () => {
                     <label style={{ fontSize: 11, color: "var(--text-muted)", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 500, display: "block", marginBottom: 6 }}>About Me</label>
                     <textarea value={about} onChange={e => setAbout(e.target.value)} className="ss-input" rows={3} placeholder="A short bio — what you do, what you're building..." style={{ resize: "none" }} />
                   </div>
+                  <div>
+                    <label style={{ fontSize: 11, color: "var(--text-muted)", letterSpacing: "0.06em", textTransform: "uppercase", fontWeight: 500, display: "block", marginBottom: 6 }}>Teaching Rate (₹/hr)</label>
+                    <div style={{ position: "relative" }}>
+                      <span style={{
+                        position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)",
+                        color: "var(--text-muted)", fontSize: 14, pointerEvents: "none",
+                      }}>
+                        <FaRupeeSign />
+                      </span>
+                      <input
+                        type="number" min="0" step="50"
+                        value={pricePerHour}
+                        onChange={e => setPricePerHour(e.target.value)}
+                        className="ss-input"
+                        placeholder="e.g. 500  (leave 0 for free swap)"
+                        style={{ paddingLeft: 32 }}
+                      />
+                    </div>
+                    <p style={{ fontSize: 11, color: "var(--text-muted)", margin: "5px 0 0" }}>
+                      Set to 0 if you're offering a free skill swap.
+                    </p>
+                  </div>
                   <button type="submit" className="btn-primary" style={{ padding: "11px", fontSize: 14, borderRadius: 10 }}>
                     Save Changes
                   </button>
@@ -283,6 +312,27 @@ const EditProfile = () => {
                       {learnSkills.map(s => <Pill key={s} text={s} variant="learn" />)}
                     </div>
                   )}
+                </div>
+
+                {/* Teaching Rate display card */}
+                <div className="ss-card" style={{ padding: "18px 22px", borderRadius: 16, display: "flex", alignItems: "center", gap: 14 }}>
+                  <div style={{
+                    width: 42, height: 42, borderRadius: 12, flexShrink: 0,
+                    background: "rgba(244,170,50,0.12)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                  }}>
+                    <FaRupeeSign style={{ color: "var(--amber)", fontSize: 18 }} />
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 11, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 500, margin: "0 0 4px" }}>Teaching Rate</p>
+                    {user?.pricePerHour > 0 ? (
+                      <p style={{ fontSize: 20, fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>
+                        ₹{user.pricePerHour}<span style={{ fontSize: 12, fontWeight: 500, color: "var(--text-muted)", marginLeft: 4 }}>/hr</span>
+                      </p>
+                    ) : (
+                      <p style={{ fontSize: 14, fontWeight: 600, margin: 0, color: "var(--green)" }}>🔄 Free Skill Swap</p>
+                    )}
+                  </div>
                 </div>
               </>
             )}

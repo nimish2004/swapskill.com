@@ -905,11 +905,30 @@ const Dashboard = () => {
                       </div>
                     </div>
 
-                    <div style={{ display: "flex", alignItems: "center", gap: 2, marginBottom: 10 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 2, marginBottom: 6 }}>
                       {[...Array(fullStars)].map((_, i)  => <FaStar    key={i}           style={{ color: "var(--amber)", fontSize: 10 }} />)}
                       {[...Array(emptyStars)].map((_, i) => <FaRegStar key={i+fullStars} style={{ color: "var(--border)", fontSize: 10 }} />)}
                       <span style={{ fontSize: 11, color: "var(--text-muted)", marginLeft: 4 }}>{avg} ({total})</span>
                     </div>
+
+                    {/* ── Price badge ── */}
+                    {!isMe && (
+                      <div style={{
+                        display: "flex", alignItems: "center", gap: 6,
+                        marginBottom: 10, padding: "5px 10px",
+                        background: user.pricePerHour > 0 ? "rgba(244,170,50,0.1)" : "var(--green-dim)",
+                        border: `1px solid ${user.pricePerHour > 0 ? "rgba(244,170,50,0.25)" : "#2d9e6b28"}`,
+                        borderRadius: 8, width: "fit-content",
+                      }}>
+                        {user.pricePerHour > 0 ? (
+                          <>
+                            <span style={{ fontSize: 11, color: "var(--amber)", fontWeight: 700 }}>₹{user.pricePerHour}/hr</span>
+                          </>
+                        ) : (
+                          <span style={{ fontSize: 11, color: "var(--green)", fontWeight: 700 }}>🔄 Free Swap</span>
+                        )}
+                      </div>
+                    )}
 
                     {isMe ? (
                       <button onClick={() => navigate("/edit-profile")} className="btn-outline" style={{ width: "100%", padding: "7px 0", fontSize: 12 }}>Edit Profile</button>

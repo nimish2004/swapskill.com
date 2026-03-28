@@ -74,6 +74,9 @@ router.post("/login", async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        canTeach: user.canTeach,
+        wantToLearn: user.wantToLearn,
+        pricePerHour: user.pricePerHour || 0,
       },
     });
   } catch (err) {
@@ -88,7 +91,7 @@ router.post("/login", async (req, res) => {
 router.put("/update", verifyToken, async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { name, canTeach, wantToLearn } = req.body;
+    const { name, canTeach, wantToLearn, pricePerHour } = req.body;
 
     if (!userId || !name) {
       return res.status(400).json({ error: "Missing required fields" });
@@ -96,11 +99,20 @@ router.put("/update", verifyToken, async (req, res) => {
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { name, canTeach, wantToLearn },
+      { name, canTeach, wantToLearn, pricePerHour: Number(pricePerHour) || 0 },
       { new: true }
     );
 
-    res.status(200).json({ user: updatedUser });
+    res.status(200).json({
+      user: {
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        canTeach: updatedUser.canTeach,
+        wantToLearn: updatedUser.wantToLearn,
+        pricePerHour: updatedUser.pricePerHour || 0,
+      },
+    });
   } catch (err) {
     console.error("Update Error:", err.message);
     res.status(500).json({ error: "Server error" });

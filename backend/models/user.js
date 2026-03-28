@@ -48,6 +48,8 @@ const userSchema = new mongoose.Schema({
 
   wantToLearn: { type: String, default: "" },
 
+  pricePerHour: { type: Number, default: 0 }, // 0 = free/swap only
+
   requests: [requestSchema],
 
   acceptedRequests: [requestSchema],
